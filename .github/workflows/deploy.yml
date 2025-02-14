@@ -1,9 +1,9 @@
-name: Deploy React App
+name: Deploy Next.js App to Windows Laptop
 
 on:
   push:
     branches:
-      - main  # Change if you're using a different branch
+      - main  # Change if using a different branch
 
 jobs:
   deploy:
@@ -19,19 +19,19 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install  # or yarn install
 
-      - name: Build React App
-        run: npm run build
+      - name: Build Next.js App
+        run: npm run build  # Generates the .next folder
 
-      - name: Deploy to EC2
+      - name: Deploy to Windows Laptop via SSH
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.WINDOWS_SSH_PRIVATE_KEY }}
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
-          scp -o StrictHostKeyChecking=no -r build ubuntu@your-ec2-ip:/home/ubuntu/react-app
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@your-ec2-ip << 'EOF'
-            cd /home/ubuntu/react-app
-            pm2 restart all || pm2 start npm --name "react-app" -- start
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r .next/ Sahil@192.168.1.10:/C/Users/Sahil/next-app
+          ssh -o StrictHostKeyChecking=no -i private_key.pem Sahil@192.168.1.10 << 'EOF'
+            cd C:/Users/YourUser/next-app
+            pm2 restart all || pm2 start npm --name "next-app" -- run start
           EOF
